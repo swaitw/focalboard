@@ -8,21 +8,17 @@ import (
 	"github.com/mattermost/focalboard/server/services/store"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mattermost/mattermost-server/v6/shared/mlog"
+	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )
 
 func SetupTests(t *testing.T) (store.Store, func()) {
-	dbType := os.Getenv("FB_STORE_TEST_DB_TYPE")
-	if dbType == "" {
-		dbType = sqliteDBType
-	}
+	origUnitTesting := os.Getenv("FOCALBOARD_UNIT_TESTING")
+	os.Setenv("FOCALBOARD_UNIT_TESTING", "1")
 
-	connectionString := os.Getenv("FB_STORE_TEST_CONN_STRING")
-	if connectionString == "" {
-		connectionString = ":memory:"
-	}
+	dbType, connectionString, err := PrepareNewTestDatabase()
+	require.NoError(t, err)
 
-	logger := mlog.CreateConsoleTestLogger(false, mlog.LvlDebug)
+	logger, _ := mlog.NewLogger()
 
 	sqlDB, err := sql.Open(dbType, connectionString)
 	require.NoError(t, err)
@@ -32,18 +28,22 @@ func SetupTests(t *testing.T) (store.Store, func()) {
 	storeParams := Params{
 		DBType:           dbType,
 		ConnectionString: connectionString,
+		DBPingAttempts:   5,
 		TablePrefix:      "test_",
 		Logger:           logger,
 		DB:               sqlDB,
-		IsPlugin:         false,
 	}
 	store, err := New(storeParams)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	tearDown := func() {
 		defer func() { _ = logger.Shutdown() }()
 		err = store.Shutdown()
 		require.Nil(t, err)
+		if err = os.Remove(connectionString); err == nil {
+			logger.Debug("Removed test database", mlog.String("file", connectionString))
+		}
+		os.Setenv("FOCALBOARD_UNIT_TESTING", origUnitTesting)
 	}
 
 	return store, tearDown

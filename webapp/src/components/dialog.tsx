@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React from 'react'
+import React, {useRef} from 'react'
 import {useIntl} from 'react-intl'
 import {useHotkeys} from 'react-hotkeys-hook'
 
@@ -12,16 +12,18 @@ import './dialog.scss'
 
 type Props = {
     children: React.ReactNode
+    size?: string
     toolsMenu?: React.ReactNode // some dialogs may not  require a toolmenu
     toolbar?: React.ReactNode
     hideCloseButton?: boolean
     className?: string
-    onClose: () => void,
+    title?: JSX.Element
+    subtitle?: JSX.Element
+    onClose: () => void
 }
 
-const Dialog = React.memo((props: Props) => {
-    const {toolsMenu} = props
-    const {toolbar} = props
+const Dialog = (props: Props) => {
+    const {toolsMenu, toolbar, title, subtitle, size} = props
     const intl = useIntl()
 
     const closeDialogText = intl.formatMessage({
@@ -31,13 +33,24 @@ const Dialog = React.memo((props: Props) => {
 
     useHotkeys('esc', () => props.onClose())
 
+    const isBackdropClickedRef = useRef(false)
+
     return (
-        <div className={`Dialog dialog-back ${props.className}`}>
+        <div className={`Dialog dialog-back ${props.className} size--${size || 'medium'}`}>
+            <div className='backdrop'/>
             <div
                 className='wrapper'
                 onClick={(e) => {
+                    e.stopPropagation()
+                    if (!isBackdropClickedRef.current) {
+                        return
+                    }
+                    isBackdropClickedRef.current = false
+                    props.onClose()
+                }}
+                onMouseDown={(e) => {
                     if (e.target === e.currentTarget) {
-                        props.onClose()
+                        isBackdropClickedRef.current = true
                     }
                 }}
             >
@@ -46,30 +59,37 @@ const Dialog = React.memo((props: Props) => {
                     className='dialog'
                 >
                     <div className='toolbar'>
-                        {
-                            !props.hideCloseButton &&
-                            <IconButton
-                                onClick={props.onClose}
-                                icon={<CloseIcon/>}
-                                title={closeDialogText}
-                                className='IconButton--large'
-                            />
-                        }
-                        {toolbar && <div className='cardToolbar'>{toolbar}</div>}
-                        {toolsMenu && <MenuWrapper>
-                            <IconButton
-                                className='IconButton--large'
-                                icon={<OptionsIcon/>}
-                            />
-                            {toolsMenu}
-                        </MenuWrapper>
-                        }
+                        <div>
+                            {<h1 className='dialog-title'>{title || ''}</h1>}
+                            {subtitle && <h5 className='dialog-subtitle'>{subtitle}</h5>}
+                        </div>
+                        <div className='toolbar--right'>
+                            {toolbar && <div className='d-flex'>{toolbar}</div>}
+                            {toolsMenu && <MenuWrapper>
+                                <IconButton
+                                    size='medium'
+                                    icon={<OptionsIcon/>}
+                                />
+                                {toolsMenu}
+                            </MenuWrapper>
+                            }
+                            {
+                                !props.hideCloseButton &&
+                                <IconButton
+                                    className='dialog__close'
+                                    onClick={props.onClose}
+                                    icon={<CloseIcon/>}
+                                    title={closeDialogText}
+                                    size='medium'
+                                />
+                            }
+                        </div>
                     </div>
                     {props.children}
                 </div>
             </div>
         </div>
     )
-})
+}
 
-export default Dialog
+export default React.memo(Dialog)

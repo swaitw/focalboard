@@ -3,8 +3,11 @@
 exports[`components/dialog should match snapshot 1`] = `
 <div>
   <div
-    class="Dialog dialog-back undefined"
+    class="Dialog dialog-back undefined size--medium"
   >
+    <div
+      class="backdrop"
+    />
     <div
       class="wrapper"
     >
@@ -15,16 +18,25 @@ exports[`components/dialog should match snapshot 1`] = `
         <div
           class="toolbar"
         >
-          <button
-            aria-label="Close dialog"
-            class="Button IconButton IconButton--large"
-            title="Close dialog"
-            type="button"
-          >
-            <i
-              class="CompassIcon icon-close CloseIcon"
+          <div>
+            <h1
+              class="dialog-title"
             />
-          </button>
+          </div>
+          <div
+            class="toolbar--right"
+          >
+            <button
+              aria-label="Close dialog"
+              class="IconButton dialog__close size--medium"
+              title="Close dialog"
+              type="button"
+            >
+              <i
+                class="CompassIcon icon-close CloseIcon"
+              />
+            </button>
+          </div>
         </div>
         <div
           id="test"
@@ -38,8 +50,11 @@ exports[`components/dialog should match snapshot 1`] = `
 exports[`components/dialog should return dialog and click on cancel button 1`] = `
 <div>
   <div
-    class="Dialog dialog-back undefined"
+    class="Dialog dialog-back undefined size--medium"
   >
+    <div
+      class="backdrop"
+    />
     <div
       class="wrapper"
     >
@@ -50,27 +65,36 @@ exports[`components/dialog should return dialog and click on cancel button 1`] =
         <div
           class="toolbar"
         >
-          <button
-            aria-label="Close dialog"
-            class="Button IconButton IconButton--large"
-            title="Close dialog"
-            type="button"
-          >
-            <i
-              class="CompassIcon icon-close CloseIcon"
+          <div>
+            <h1
+              class="dialog-title"
             />
-          </button>
+          </div>
           <div
-            aria-label="menuwrapper"
-            class="MenuWrapper"
-            role="button"
+            class="toolbar--right"
           >
+            <div
+              aria-label="menuwrapper"
+              class="MenuWrapper"
+              role="button"
+            >
+              <button
+                class="IconButton size--medium"
+                type="button"
+              >
+                <i
+                  class="CompassIcon icon-dots-horizontal OptionsIcon"
+                />
+              </button>
+            </div>
             <button
-              class="Button IconButton IconButton--large"
+              aria-label="Close dialog"
+              class="IconButton dialog__close size--medium"
+              title="Close dialog"
               type="button"
             >
               <i
-                class="CompassIcon icon-dots-horizontal OptionsIcon"
+                class="CompassIcon icon-close CloseIcon"
               />
             </button>
           </div>

@@ -2,17 +2,20 @@
 // See LICENSE.txt for license information.
 
 import React from 'react'
-import {render, screen, act} from '@testing-library/react'
+import {render, screen, act, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {mocked} from 'ts-jest/utils'
+import {mocked} from 'jest-mock'
 import '@testing-library/jest-dom'
 import {createIntl} from 'react-intl'
 
-import {PropertyType} from '../../blocks/board'
+import configureStore from 'redux-mock-store'
+import {Provider as ReduxProvider} from 'react-redux'
+
 import {wrapIntl} from '../../testUtils'
 import {TestBlockFactory} from '../../test/testBlockFactory'
 import mutator from '../../mutator'
-import {propertyTypesList, typeDisplayName} from '../../widgets/propertyMenu'
+import propsRegistry from '../../properties'
+import {PropertyType} from '../../properties/types'
 
 import CardDetailProperties from './cardDetailProperties'
 
@@ -21,7 +24,7 @@ const mockedMutator = mocked(mutator, true)
 
 describe('components/cardDetail/CardDetailProperties', () => {
     const board = TestBlockFactory.createBoard()
-    board.fields.cardProperties = [
+    board.cardProperties = [
         {
             id: 'property_id_1',
             name: 'Owner',
@@ -67,19 +70,60 @@ describe('components/cardDetail/CardDetailProperties', () => {
 
     const cards = [card]
 
+    const state = {
+        users: {
+            me: {
+                id: 'user_id_1',
+            },
+            myConfig: {
+                onboardingTourStarted: {value: true},
+                tourCategory: {value: 'card'},
+                onboardingTourStep: {value: '1'},
+            },
+        },
+        teams: {
+            current: {id: 'team-id'},
+        },
+        boards: {
+            boards: {
+                [board.id]: board,
+            },
+            current: board.id,
+            myBoardMemberships: {
+                [board.id]: {userId: 'user_id_1', schemeAdmin: true},
+            },
+        },
+        cards: {
+            cards: {
+                [card.id]: card,
+            },
+            current: card.id,
+        },
+        clientConfig: {
+            value: {},
+        },
+    }
+
+    const mockStore = configureStore([])
+    let store = mockStore(state)
+
+    beforeEach(() => {
+        store = mockStore(state)
+    })
+
     function renderComponent() {
-        const component = wrapIntl((
-            <CardDetailProperties
-                board={board!}
-                card={card}
-                cards={[card]}
-                contents={[]}
-                comments={[]}
-                activeView={view}
-                views={views}
-                readonly={false}
-            />
-        ))
+        const component = wrapIntl(
+            <ReduxProvider store={store}>
+                <CardDetailProperties
+                    board={board!}
+                    card={card}
+                    cards={[card]}
+                    activeView={view}
+                    views={views}
+                    readonly={false}
+                />
+            </ReduxProvider>,
+        )
 
         return render(component)
     }
@@ -98,7 +142,7 @@ describe('components/cardDetail/CardDetailProperties', () => {
         const deleteButton = screen.getByRole('button', {name: /delete/i})
         userEvent.click(deleteButton)
 
-        expect(screen.getByRole('heading', {name: 'Confirm Delete Property'})).toBeInTheDocument()
+        expect(screen.getByRole('heading', {name: 'Confirm delete property'})).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /delete/i})).toBeInTheDocument()
     })
 
@@ -113,24 +157,36 @@ describe('components/cardDetail/CardDetailProperties', () => {
         const selectProperty = screen.getByText(/select property type/i)
         expect(selectProperty).toBeInTheDocument()
 
-        propertyTypesList.forEach((type: PropertyType) => {
-            const typeButton = screen.getByRole('button', {name: typeDisplayName(intl, type)})
+        propsRegistry.list().forEach((type: PropertyType) => {
+            const typeButton = screen.getByRole('button', {name: type.displayName(intl)})
             expect(typeButton).toBeInTheDocument()
         })
+    })
+
+    it('should allow change property types menu, confirm', () => {
+        renderComponent()
+
+        const menuElement = screen.getByRole('button', {name: 'Owner'})
+        userEvent.click(menuElement)
+
+        const typeProperty = screen.getByText(/Type: Select/i)
+        expect(typeProperty).toBeInTheDocument()
+
+        fireEvent.mouseOver(typeProperty)
+
+        const newTypeMenu = screen.getByRole('button', {name: 'Text'})
+        userEvent.click(newTypeMenu)
+
+        expect(screen.getByRole('heading', {name: 'Confirm property type change'})).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /Change property/i})).toBeInTheDocument()
     })
 
     test('rename select property and confirm button on dialog should rename property', async () => {
         const result = renderComponent()
 
         // rename to "Owner-Renamed"
-        onPropertyRenameOpenConfirmationDialog(result.container)
-
-        const propertyTemplate = board.fields.cardProperties[0]
-
-        const confirmButton = result.getByTitle('Change Property')
-        expect(confirmButton).toBeDefined()
-
-        userEvent.click(confirmButton!)
+        onPropertyRenameNoConfirmationDialog(result.container)
+        const propertyTemplate = board.cardProperties[0]
 
         // should be called once on confirming renaming the property
         expect(mockedMutator.changePropertyTypeAndName).toBeCalledTimes(1)
@@ -157,26 +213,13 @@ describe('components/cardDetail/CardDetailProperties', () => {
         expect(template!.type).toBe('number')
     })
 
-    it('cancel button in TypeorNameChange dialog should do nothing', () => {
-        const result = renderComponent()
-        const container = result.container
-        onPropertyRenameOpenConfirmationDialog(container)
-
-        const cancelButton = result.getByTitle('Cancel')
-        expect(cancelButton).toBeDefined()
-
-        userEvent.click(cancelButton!)
-
-        expect(container).toMatchSnapshot()
-    })
-
     it('confirmation on delete dialog should delete the property', () => {
         const result = renderComponent()
         const container = result.container
 
         openDeleteConfirmationDialog(container)
 
-        const propertyTemplate = board.fields.cardProperties[0]
+        const propertyTemplate = board.cardProperties[0]
 
         const confirmButton = result.getByTitle('Delete')
         expect(confirmButton).toBeDefined()
@@ -202,7 +245,7 @@ describe('components/cardDetail/CardDetailProperties', () => {
         expect(container).toMatchSnapshot()
     })
 
-    function openDeleteConfirmationDialog(container:HTMLElement) {
+    function openDeleteConfirmationDialog(container: HTMLElement) {
         const propertyLabel = container.querySelector('.MenuWrapper')
         expect(propertyLabel).toBeDefined()
         userEvent.click(propertyLabel!)
@@ -215,7 +258,7 @@ describe('components/cardDetail/CardDetailProperties', () => {
         expect(confirmDialog).toBeDefined()
     }
 
-    function onPropertyRenameOpenConfirmationDialog(container:HTMLElement) {
+    function onPropertyRenameNoConfirmationDialog(container: HTMLElement) {
         const propertyLabel = container.querySelector('.MenuWrapper')
         expect(propertyLabel).toBeDefined()
         userEvent.click(propertyLabel!)
@@ -225,9 +268,5 @@ describe('components/cardDetail/CardDetailProperties', () => {
         expect(propertyNameInput).toBeDefined()
         userEvent.type(propertyNameInput!, 'Owner - Renamed{enter}')
         userEvent.click(propertyLabel!)
-
-        const confirmDialog = container.querySelector('.dialog.confirmation-dialog-box')
-        expect(confirmDialog).toBeDefined()
     }
 })
-

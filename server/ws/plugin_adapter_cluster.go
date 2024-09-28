@@ -3,20 +3,25 @@ package ws
 import (
 	"encoding/json"
 
-	mmModel "github.com/mattermost/mattermost-server/v6/model"
+	mmModel "github.com/mattermost/mattermost/server/public/model"
+	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )
 
 type ClusterMessage struct {
-	WorkspaceID string
+	TeamID      string
+	BoardID     string
+	UserID      string
 	Payload     map[string]interface{}
+	EnsureUsers []string
 }
 
-func (pa *PluginAdapter) sendMessageToCluster(id string, clusterMessage *ClusterMessage) {
+func (pa *PluginAdapter) sendMessageToCluster(clusterMessage *ClusterMessage) {
+	const id = "websocket_message"
 	b, err := json.Marshal(clusterMessage)
 	if err != nil {
-		pa.api.LogError("couldn't get JSON bytes from cluster message",
-			"id", id,
-			"err", err,
+		pa.logger.Error("couldn't get JSON bytes from cluster message",
+			mlog.String("id", id),
+			mlog.Err(err),
 		)
 		return
 	}
@@ -27,22 +32,27 @@ func (pa *PluginAdapter) sendMessageToCluster(id string, clusterMessage *Cluster
 	}
 
 	if err := pa.api.PublishPluginClusterEvent(event, opts); err != nil {
-		pa.api.LogError("error publishing cluster event",
-			"id", id,
-			"err", err,
+		pa.logger.Error("error publishing cluster event",
+			mlog.String("id", id),
+			mlog.Err(err),
 		)
 	}
 }
 
 func (pa *PluginAdapter) HandleClusterEvent(ev mmModel.PluginClusterEvent) {
-	pa.api.LogDebug("received cluster event", "id", ev.Id)
+	pa.logger.Debug("received cluster event", mlog.String("id", ev.Id))
 
 	var clusterMessage ClusterMessage
 	if err := json.Unmarshal(ev.Data, &clusterMessage); err != nil {
-		pa.api.LogError("cannot unmarshal cluster message data",
-			"id", ev.Id,
-			"err", err,
+		pa.logger.Error("cannot unmarshal cluster message data",
+			mlog.String("id", ev.Id),
+			mlog.Err(err),
 		)
+		return
+	}
+
+	if clusterMessage.BoardID != "" {
+		pa.sendBoardMessageSkipCluster(clusterMessage.TeamID, clusterMessage.BoardID, clusterMessage.Payload, clusterMessage.EnsureUsers...)
 		return
 	}
 
@@ -54,12 +64,17 @@ func (pa *PluginAdapter) HandleClusterEvent(ev mmModel.PluginClusterEvent) {
 	}
 	if action == "" {
 		// no action was specified in the event; assume block change and warn.
-		action = websocketActionUpdateBlock
-		pa.api.LogWarn("cannot determine action from cluster message data",
-			"id", ev.Id,
-			"payload", clusterMessage.Payload,
+		pa.logger.Warn("cannot determine action from cluster message data",
+			mlog.String("id", ev.Id),
+			mlog.Map("payload", clusterMessage.Payload),
 		)
+		return
 	}
 
-	pa.sendWorkspaceMessageSkipCluster(action, clusterMessage.WorkspaceID, clusterMessage.Payload)
+	if clusterMessage.UserID != "" {
+		pa.sendUserMessageSkipCluster(action, clusterMessage.Payload, clusterMessage.UserID)
+		return
+	}
+
+	pa.sendTeamMessageSkipCluster(action, clusterMessage.TeamID, clusterMessage.Payload)
 }

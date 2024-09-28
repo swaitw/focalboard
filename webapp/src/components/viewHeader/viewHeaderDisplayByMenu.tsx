@@ -4,6 +4,8 @@
 import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
+import {DatePropertyType} from '../../properties/types'
+
 import {IPropertyTemplate} from '../../blocks/board'
 import {BoardView} from '../../blocks/boardView'
 import mutator from '../../mutator'
@@ -11,7 +13,8 @@ import Button from '../../widgets/buttons/button'
 import Menu from '../../widgets/menu'
 import MenuWrapper from '../../widgets/menuWrapper'
 import CheckIcon from '../../widgets/icons/check'
-import {typeDisplayName} from '../../widgets/propertyMenu'
+
+import propsRegistry from '../../properties'
 
 type Props = {
     properties: readonly IPropertyTemplate[]
@@ -19,14 +22,14 @@ type Props = {
     dateDisplayPropertyName?: string
 }
 
-const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
+const ViewHeaderDisplayByMenu = (props: Props) => {
     const {properties, activeView, dateDisplayPropertyName} = props
     const intl = useIntl()
 
-    const createdDateName = typeDisplayName(intl, 'createdTime')
+    const createdDateName = propsRegistry.get('createdTime').displayName(intl)
 
-    const getDateProperties = () : IPropertyTemplate[] => {
-        return properties?.filter((o: IPropertyTemplate) => o.type === 'date' || o.type === 'createdTime' || o.type === 'updatedTime')
+    const getDateProperties = (): IPropertyTemplate[] => {
+        return properties?.filter((o: IPropertyTemplate) => propsRegistry.get(o.type) instanceof DatePropertyType)
     }
 
     return (
@@ -58,7 +61,7 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
                             if (activeView.fields.dateDisplayPropertyId === id) {
                                 return
                             }
-                            mutator.changeViewDateDisplayPropertyId(activeView.id, activeView.fields.dateDisplayPropertyId, id)
+                            mutator.changeViewDateDisplayPropertyId(activeView.boardId, activeView.id, activeView.fields.dateDisplayPropertyId, id)
                         }}
                     />
                 ))}
@@ -74,6 +77,6 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
             </Menu>
         </MenuWrapper>
     )
-})
+}
 
-export default ViewHeaderDisplayByMenu
+export default React.memo(ViewHeaderDisplayByMenu)

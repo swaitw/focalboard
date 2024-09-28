@@ -8,10 +8,12 @@ export const TelemetryCategory = 'boards'
 
 export const TelemetryActions = {
     ClickChannelHeader: 'clickChannelHeader',
+    ClickChannelIntro: 'channelIntro_boardLink',
     ViewBoard: 'viewBoard',
     CreateBoard: 'createBoard',
     DuplicateBoard: 'duplicateBoard',
     DeleteBoard: 'deleteBoard',
+    DeleteBoardTemplate: 'deleteBoardTemplate',
     ShareBoard: 'shareBoard',
     CreateBoardTemplate: 'createBoardTemplate',
     CreateBoardViaTemplate: 'createBoardViaTemplate',
@@ -28,17 +30,39 @@ export const TelemetryActions = {
     DeleteCard: 'deleteCard',
     AddTemplateFromCard: 'addTemplateFromCard',
     ViewSharedBoard: 'viewSharedBoard',
+    ShareBoardOpenModal: 'shareBoard_openModal',
+    ShareBoardLogin: 'shareBoard_login',
+    ShareLinkPublicCopy: 'shareLinkPublic_copy',
+    ShareLinkInternalCopy: 'shareLinkInternal_copy',
+    ImportArchive: 'settings_importArchive',
+    ImportTrello: 'settings_importTrello',
+    ImportAsana: 'settings_importAsana',
+    ImportNotion: 'settings_importNotion',
+    ImportJira: 'settings_importJira',
+    ImportTodoist: 'settings_importTodoist',
+    ExportArchive: 'settings_exportArchive',
+    StartTour: 'welcomeScreen_startTour',
+    SkipTour: 'welcomeScreen_skipTour',
+    CloudMoreInfo: 'cloud_more_info',
+    ViewLimitReached: 'limit_ViewLimitReached',
+    ViewLimitCTAPerformed: 'limit_ViewLimitLinkOpen',
+    LimitCardCTAPerformed: 'limit_CardLimitCTAPerformed',
+    LimitCardLimitReached: 'limit_cardLimitReached',
+    LimitCardLimitLinkOpen: 'limit_cardLimitLinkOpen',
+    VersionMoreInfo: 'version_more_info',
+    ClickChannelsRHSBoard: 'click_board_in_channels_RHS',
 }
 
 interface IEventProps {
-    workspaceID?: string,
-    board?: string,
-    view?: string,
-    viewType?: string,
-    card?: string,
-    cardTemplateId?: string,
-    boardTemplateId?: string,
-    shareBoardEnabled?: boolean,
+    channelID?: string
+    teamID?: string
+    board?: string
+    view?: string
+    viewType?: string
+    card?: string
+    cardTemplateId?: string
+    boardTemplateId?: string
+    shareBoardEnabled?: boolean
 }
 
 class TelemetryClient {

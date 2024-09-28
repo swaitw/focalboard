@@ -13,9 +13,10 @@ import (
 	"github.com/mattermost/focalboard/server/model"
 	"github.com/mattermost/focalboard/server/server"
 	"github.com/mattermost/focalboard/server/services/config"
+	"github.com/mattermost/focalboard/server/services/permissions/localpermissions"
 )
 import (
-	"github.com/mattermost/mattermost-server/v6/shared/mlog"
+	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )
 
 // Active server used with shared code (dll)
@@ -50,16 +51,6 @@ func monitorPid(pid int, logger *mlog.Logger) {
 			time.Sleep(timeBetweenPidMonitoringChecks)
 		}
 	}()
-}
-
-func logInfo(logger *mlog.Logger) {
-	logger.Info("FocalBoard Server",
-		mlog.String("version", model.CurrentVersion),
-		mlog.String("edition", model.Edition),
-		mlog.String("build_number", model.BuildNumber),
-		mlog.String("build_date", model.BuildDate),
-		mlog.String("build_hash", model.BuildHash),
-	)
 }
 
 func main() {
@@ -100,7 +91,7 @@ func main() {
 		defer restore()
 	}
 
-	logInfo(logger)
+	model.LogServerInfo(logger)
 
 	singleUser := false
 	if pSingleUser != nil {
@@ -131,7 +122,7 @@ func main() {
 	if pDBConfig != nil && len(*pDBConfig) > 0 {
 		config.DBConfigString = *pDBConfig
 		// Don't echo, as the confix string may contain passwords
-		logger.Info("DBConfigString overriden from commandline")
+		logger.Info("DBConfigString overridden from commandline")
 	}
 
 	if pPort != nil && *pPort > 0 && *pPort != config.Port {
@@ -140,16 +131,19 @@ func main() {
 		config.Port = *pPort
 	}
 
-	db, err := server.NewStore(config, logger)
+	db, err := server.NewStore(config, singleUser, logger)
 	if err != nil {
 		logger.Fatal("server.NewStore ERROR", mlog.Err(err))
 	}
 
+	permissionsService := localpermissions.New(db, logger)
+
 	params := server.Params{
-		Cfg:             config,
-		SingleUserToken: singleUserToken,
-		DBStore:         db,
-		Logger:          logger,
+		Cfg:                config,
+		SingleUserToken:    singleUserToken,
+		DBStore:            db,
+		Logger:             logger,
+		PermissionsService: permissionsService,
 	}
 
 	server, err := server.New(params)
@@ -172,6 +166,7 @@ func main() {
 }
 
 // StartServer starts the server
+//
 //export StartServer
 func StartServer(webPath *C.char, filesPath *C.char, port int, singleUserToken, dbConfigString, configFilePath *C.char) {
 	startServer(
@@ -185,6 +180,7 @@ func StartServer(webPath *C.char, filesPath *C.char, port int, singleUserToken, 
 }
 
 // StopServer stops the server
+//
 //export StopServer
 func StopServer() {
 	stopServer()
@@ -210,7 +206,7 @@ func startServer(webPath string, filesPath string, port int, singleUserToken, db
 		return
 	}
 
-	logInfo(logger)
+	model.LogServerInfo(logger)
 
 	if len(filesPath) > 0 {
 		config.FilesPath = filesPath
@@ -228,16 +224,20 @@ func startServer(webPath string, filesPath string, port int, singleUserToken, db
 		config.DBConfigString = dbConfigString
 	}
 
-	db, err := server.NewStore(config, logger)
+	singleUser := len(singleUserToken) > 0
+	db, err := server.NewStore(config, singleUser, logger)
 	if err != nil {
 		logger.Fatal("server.NewStore ERROR", mlog.Err(err))
 	}
 
+	permissionsService := localpermissions.New(db, logger)
+
 	params := server.Params{
-		Cfg:             config,
-		SingleUserToken: singleUserToken,
-		DBStore:         db,
-		Logger:          logger,
+		Cfg:                config,
+		SingleUserToken:    singleUserToken,
+		DBStore:            db,
+		Logger:             logger,
+		PermissionsService: permissionsService,
 	}
 
 	pServer, err = server.New(params)
@@ -255,11 +255,16 @@ func stopServer() {
 		return
 	}
 
+	logger := pServer.Logger()
+
 	err := pServer.Shutdown()
 	if err != nil {
-		pServer.Logger().Error("server.Shutdown ERROR", mlog.Err(err))
+		logger.Error("server.Shutdown ERROR", mlog.Err(err))
 	}
-	_ = pServer.Logger().Shutdown()
+
+	if l, ok := logger.(*mlog.Logger); ok {
+		_ = l.Shutdown()
+	}
 	pServer = nil
 }
 

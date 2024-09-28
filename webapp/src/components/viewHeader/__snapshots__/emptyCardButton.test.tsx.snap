@@ -7,24 +7,36 @@ exports[`components/viewHeader/emptyCardButton return EmptyCardButton 1`] = `
     class="MenuOption TextOption menu-option bold-menu-text"
     role="button"
   >
-    <svg
-      class="CardIcon Icon"
-      viewBox="0 0 100 100"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        height="40"
-        rx="3"
-        ry="3"
-        width="60"
-        x="20"
-        y="30"
-      />
-    </svg>
     <div
-      class="menu-name"
+      class="d-flex"
     >
-      Empty card
+      <div
+        class="menu-option__icon"
+      >
+        <svg
+          class="CardIcon Icon"
+          viewBox="0 0 100 100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            height="40"
+            rx="3"
+            ry="3"
+            width="60"
+            x="20"
+            y="30"
+          />
+        </svg>
+      </div>
+    </div>
+    <div
+      class="menu-option__content"
+    >
+      <div
+        class="menu-name"
+      >
+        Empty card
+      </div>
     </div>
     <div
       aria-label="menuwrapper"
@@ -32,7 +44,7 @@ exports[`components/viewHeader/emptyCardButton return EmptyCardButton 1`] = `
       role="button"
     >
       <button
-        class="Button IconButton"
+        class="IconButton"
         type="button"
       >
         <i
@@ -51,32 +63,44 @@ exports[`components/viewHeader/emptyCardButton return EmptyCardButton and Set Te
     class="MenuOption TextOption menu-option bold-menu-text"
     role="button"
   >
-    <svg
-      class="CardIcon Icon"
-      viewBox="0 0 100 100"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        height="40"
-        rx="3"
-        ry="3"
-        width="60"
-        x="20"
-        y="30"
-      />
-    </svg>
     <div
-      class="menu-name"
+      class="d-flex"
     >
-      Empty card
+      <div
+        class="menu-option__icon"
+      >
+        <svg
+          class="CardIcon Icon"
+          viewBox="0 0 100 100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            height="40"
+            rx="3"
+            ry="3"
+            width="60"
+            x="20"
+            y="30"
+          />
+        </svg>
+      </div>
+    </div>
+    <div
+      class="menu-option__content"
+    >
+      <div
+        class="menu-name"
+      >
+        Empty card
+      </div>
     </div>
     <div
       aria-label="menuwrapper"
-      class="MenuWrapper"
+      class="MenuWrapper override menuOpened"
       role="button"
     >
       <button
-        class="Button IconButton"
+        class="IconButton"
         type="button"
       >
         <i
@@ -84,7 +108,7 @@ exports[`components/viewHeader/emptyCardButton return EmptyCardButton and Set Te
         />
       </button>
       <div
-        class="Menu noselect left"
+        class="Menu noselect left "
       >
         <div
           class="menu-contents"
@@ -92,28 +116,42 @@ exports[`components/viewHeader/emptyCardButton return EmptyCardButton and Set Te
           <div
             class="menu-options"
           >
-            <div
-              aria-label="Set as default"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <svg
-                class="CheckIcon Icon"
-                viewBox="0 0 100 100"
-                xmlns="http://www.w3.org/2000/svg"
+            <div>
+              <div
+                aria-label="Set as default"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                <polyline
-                  points="20,60 40,80 80,40"
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <svg
+                      class="CheckIcon Icon"
+                      viewBox="0 0 100 100"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <polyline
+                        points="20,60 40,80 80,40"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Set as default
+                  </div>
+                </div>
+                <div
+                  class="noicon"
                 />
-              </svg>
-              <div
-                class="menu-name"
-              >
-                Set as default
               </div>
-              <div
-                class="noicon"
-              />
             </div>
           </div>
           <div
@@ -128,12 +166,20 @@ exports[`components/viewHeader/emptyCardButton return EmptyCardButton and Set Te
               role="button"
             >
               <div
-                class="noicon"
-              />
-              <div
-                class="menu-name"
+                class="d-flex"
               >
-                Cancel
+                <div
+                  class="noicon"
+                />
+              </div>
+              <div
+                class="menu-option__content"
+              >
+                <div
+                  class="menu-name"
+                >
+                  Cancel
+                </div>
               </div>
               <div
                 class="noicon"
@@ -154,24 +200,36 @@ exports[`components/viewHeader/emptyCardButton return EmptyCardButton and addCar
     class="MenuOption TextOption menu-option bold-menu-text"
     role="button"
   >
-    <svg
-      class="CardIcon Icon"
-      viewBox="0 0 100 100"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        height="40"
-        rx="3"
-        ry="3"
-        width="60"
-        x="20"
-        y="30"
-      />
-    </svg>
     <div
-      class="menu-name"
+      class="d-flex"
     >
-      Empty card
+      <div
+        class="menu-option__icon"
+      >
+        <svg
+          class="CardIcon Icon"
+          viewBox="0 0 100 100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            height="40"
+            rx="3"
+            ry="3"
+            width="60"
+            x="20"
+            y="30"
+          />
+        </svg>
+      </div>
+    </div>
+    <div
+      class="menu-option__content"
+    >
+      <div
+        class="menu-name"
+      >
+        Empty card
+      </div>
     </div>
     <div
       aria-label="menuwrapper"
@@ -179,7 +237,7 @@ exports[`components/viewHeader/emptyCardButton return EmptyCardButton and addCar
       role="button"
     >
       <button
-        class="Button IconButton"
+        class="IconButton"
         type="button"
       >
         <i

@@ -18,7 +18,9 @@ exports[`src/components/gallery/GalleryCard with a comment content return Galler
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -35,11 +37,10 @@ exports[`src/components/gallery/GalleryCard with a comment content should match 
   >
     <div
       aria-label="menuwrapper"
-      class="MenuWrapper optionsMenu"
+      class="MenuWrapper override menuOpened optionsMenu"
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -47,7 +48,7 @@ exports[`src/components/gallery/GalleryCard with a comment content should match 
         />
       </button>
       <div
-        class="Menu noselect left"
+        class="Menu noselect left "
       >
         <div
           class="menu-contents"
@@ -55,57 +56,98 @@ exports[`src/components/gallery/GalleryCard with a comment content should match 
           <div
             class="menu-options"
           >
-            <div
-              aria-label="Delete"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-trash-can-outline trash-can-outline"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Delete"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Delete
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-trash-can-outline DeleteIcon trash-can-outline"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Delete
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
               <div
-                class="noicon"
-              />
-            </div>
-            <div
-              aria-label="Duplicate"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-content-copy content-copy"
-              />
-              <div
-                class="menu-name"
+                aria-label="Duplicate"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Duplicate
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-content-copy content-copy"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Duplicate
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
-            <div
-              aria-label="Copy link"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-link-variant LinkIcon"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Copy link"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Copy link
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-link-variant LinkIcon"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Copy link
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
+            <div />
           </div>
           <div
             class="menu-spacer hideOnWidescreen"
@@ -119,12 +161,20 @@ exports[`src/components/gallery/GalleryCard with a comment content should match 
               role="button"
             >
               <div
-                class="noicon"
-              />
-              <div
-                class="menu-name"
+                class="d-flex"
               >
-                Cancel
+                <div
+                  class="noicon"
+                />
+              </div>
+              <div
+                class="menu-option__content"
+              >
+                <div
+                  class="menu-name"
+                >
+                  Cancel
+                </div>
               </div>
               <div
                 class="noicon"
@@ -145,7 +195,9 @@ exports[`src/components/gallery/GalleryCard with a comment content should match 
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -162,11 +214,10 @@ exports[`src/components/gallery/GalleryCard with an image content should match s
   >
     <div
       aria-label="menuwrapper"
-      class="MenuWrapper optionsMenu"
+      class="MenuWrapper override menuOpened optionsMenu"
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -174,7 +225,7 @@ exports[`src/components/gallery/GalleryCard with an image content should match s
         />
       </button>
       <div
-        class="Menu noselect left"
+        class="Menu noselect left "
       >
         <div
           class="menu-contents"
@@ -182,57 +233,98 @@ exports[`src/components/gallery/GalleryCard with an image content should match s
           <div
             class="menu-options"
           >
-            <div
-              aria-label="Delete"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-trash-can-outline trash-can-outline"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Delete"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Delete
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-trash-can-outline DeleteIcon trash-can-outline"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Delete
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
               <div
-                class="noicon"
-              />
-            </div>
-            <div
-              aria-label="Duplicate"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-content-copy content-copy"
-              />
-              <div
-                class="menu-name"
+                aria-label="Duplicate"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Duplicate
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-content-copy content-copy"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Duplicate
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
-            <div
-              aria-label="Copy link"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-link-variant LinkIcon"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Copy link"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Copy link
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-link-variant LinkIcon"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Copy link
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
+            <div />
           </div>
           <div
             class="menu-spacer hideOnWidescreen"
@@ -246,12 +338,20 @@ exports[`src/components/gallery/GalleryCard with an image content should match s
               role="button"
             >
               <div
-                class="noicon"
-              />
-              <div
-                class="menu-name"
+                class="d-flex"
               >
-                Cancel
+                <div
+                  class="noicon"
+                />
+              </div>
+              <div
+                class="menu-option__content"
+              >
+                <div
+                  class="menu-name"
+                >
+                  Cancel
+                </div>
               </div>
               <div
                 class="noicon"
@@ -278,7 +378,9 @@ exports[`src/components/gallery/GalleryCard with an image content should match s
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -308,7 +410,9 @@ exports[`src/components/gallery/GalleryCard with many contents return GalleryCar
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -325,11 +429,10 @@ exports[`src/components/gallery/GalleryCard with many contents should match snap
   >
     <div
       aria-label="menuwrapper"
-      class="MenuWrapper optionsMenu"
+      class="MenuWrapper override menuOpened optionsMenu"
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -337,7 +440,7 @@ exports[`src/components/gallery/GalleryCard with many contents should match snap
         />
       </button>
       <div
-        class="Menu noselect left"
+        class="Menu noselect left "
       >
         <div
           class="menu-contents"
@@ -345,57 +448,98 @@ exports[`src/components/gallery/GalleryCard with many contents should match snap
           <div
             class="menu-options"
           >
-            <div
-              aria-label="Delete"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-trash-can-outline trash-can-outline"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Delete"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Delete
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-trash-can-outline DeleteIcon trash-can-outline"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Delete
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
               <div
-                class="noicon"
-              />
-            </div>
-            <div
-              aria-label="Duplicate"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-content-copy content-copy"
-              />
-              <div
-                class="menu-name"
+                aria-label="Duplicate"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Duplicate
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-content-copy content-copy"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Duplicate
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
-            <div
-              aria-label="Copy link"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-link-variant LinkIcon"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Copy link"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Copy link
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-link-variant LinkIcon"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Copy link
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
+            <div />
           </div>
           <div
             class="menu-spacer hideOnWidescreen"
@@ -409,12 +553,20 @@ exports[`src/components/gallery/GalleryCard with many contents should match snap
               role="button"
             >
               <div
-                class="noicon"
-              />
-              <div
-                class="menu-name"
+                class="d-flex"
               >
-                Cancel
+                <div
+                  class="noicon"
+                />
+              </div>
+              <div
+                class="menu-option__content"
+              >
+                <div
+                  class="menu-name"
+                >
+                  Cancel
+                </div>
               </div>
               <div
                 class="noicon"
@@ -439,7 +591,9 @@ exports[`src/components/gallery/GalleryCard with many contents should match snap
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -456,11 +610,10 @@ exports[`src/components/gallery/GalleryCard with many images content should matc
   >
     <div
       aria-label="menuwrapper"
-      class="MenuWrapper optionsMenu"
+      class="MenuWrapper override menuOpened optionsMenu"
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -468,7 +621,7 @@ exports[`src/components/gallery/GalleryCard with many images content should matc
         />
       </button>
       <div
-        class="Menu noselect left"
+        class="Menu noselect left "
       >
         <div
           class="menu-contents"
@@ -476,57 +629,98 @@ exports[`src/components/gallery/GalleryCard with many images content should matc
           <div
             class="menu-options"
           >
-            <div
-              aria-label="Delete"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-trash-can-outline trash-can-outline"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Delete"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Delete
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-trash-can-outline DeleteIcon trash-can-outline"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Delete
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
               <div
-                class="noicon"
-              />
-            </div>
-            <div
-              aria-label="Duplicate"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-content-copy content-copy"
-              />
-              <div
-                class="menu-name"
+                aria-label="Duplicate"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Duplicate
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-content-copy content-copy"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Duplicate
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
-            <div
-              aria-label="Copy link"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-link-variant LinkIcon"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Copy link"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Copy link
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-link-variant LinkIcon"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Copy link
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
+            <div />
           </div>
           <div
             class="menu-spacer hideOnWidescreen"
@@ -540,12 +734,20 @@ exports[`src/components/gallery/GalleryCard with many images content should matc
               role="button"
             >
               <div
-                class="noicon"
-              />
-              <div
-                class="menu-name"
+                class="d-flex"
               >
-                Cancel
+                <div
+                  class="noicon"
+                />
+              </div>
+              <div
+                class="menu-option__content"
+              >
+                <div
+                  class="menu-name"
+                >
+                  Cancel
+                </div>
               </div>
               <div
                 class="noicon"
@@ -572,7 +774,9 @@ exports[`src/components/gallery/GalleryCard with many images content should matc
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -593,7 +797,6 @@ exports[`src/components/gallery/GalleryCard without block content return Gallery
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -612,7 +815,9 @@ exports[`src/components/gallery/GalleryCard without block content return Gallery
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -633,7 +838,6 @@ exports[`src/components/gallery/GalleryCard without block content return Gallery
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -652,7 +856,9 @@ exports[`src/components/gallery/GalleryCard without block content return Gallery
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -673,7 +879,6 @@ exports[`src/components/gallery/GalleryCard without block content return Gallery
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -692,8 +897,81 @@ exports[`src/components/gallery/GalleryCard without block content return Gallery
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
+      </div>
+    </div>
+  </div>
+  <div
+    class="Dialog dialog-back confirmation-dialog-box size--small"
+  >
+    <div
+      class="backdrop"
+    />
+    <div
+      class="wrapper"
+    >
+      <div
+        class="dialog"
+        role="dialog"
+      >
+        <div
+          class="toolbar"
+        >
+          <div>
+            <h1
+              class="dialog-title"
+            />
+          </div>
+          <div
+            class="toolbar--right"
+          >
+            <button
+              aria-label="Close dialog"
+              title="Close dialog"
+              type="button"
+            >
+              <i
+                class="CompassIcon icon-close CloseIcon"
+              />
+            </button>
+          </div>
+        </div>
+        <div
+          class="box-area"
+          title="Confirmation Dialog Box"
+        >
+          <h3
+            class="text-heading5"
+          >
+            Confirm card delete!
+          </h3>
+          <div
+            class="sub-text"
+          />
+          <div
+            class="action-buttons"
+          >
+            <button
+              title="Cancel"
+              type="button"
+            >
+              <span>
+                Cancel
+              </span>
+            </button>
+            <button
+              title="Delete"
+              type="submit"
+            >
+              <span>
+                Delete
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -713,7 +991,6 @@ exports[`src/components/gallery/GalleryCard without block content return Gallery
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -732,7 +1009,9 @@ exports[`src/components/gallery/GalleryCard without block content return Gallery
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -749,11 +1028,10 @@ exports[`src/components/gallery/GalleryCard without block content should match s
   >
     <div
       aria-label="menuwrapper"
-      class="MenuWrapper optionsMenu"
+      class="MenuWrapper override menuOpened optionsMenu"
       role="button"
     >
       <button
-        class="Button IconButton"
         type="button"
       >
         <i
@@ -761,7 +1039,7 @@ exports[`src/components/gallery/GalleryCard without block content should match s
         />
       </button>
       <div
-        class="Menu noselect left"
+        class="Menu noselect left "
       >
         <div
           class="menu-contents"
@@ -769,57 +1047,98 @@ exports[`src/components/gallery/GalleryCard without block content should match s
           <div
             class="menu-options"
           >
-            <div
-              aria-label="Delete"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-trash-can-outline trash-can-outline"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Delete"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Delete
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-trash-can-outline DeleteIcon trash-can-outline"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Delete
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
               <div
-                class="noicon"
-              />
-            </div>
-            <div
-              aria-label="Duplicate"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-content-copy content-copy"
-              />
-              <div
-                class="menu-name"
+                aria-label="Duplicate"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Duplicate
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-content-copy content-copy"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Duplicate
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
-            <div
-              aria-label="Copy link"
-              class="MenuOption TextOption menu-option"
-              role="button"
-            >
-              <i
-                class="CompassIcon icon-link-variant LinkIcon"
-              />
+            <div>
               <div
-                class="menu-name"
+                aria-label="Copy link"
+                class="MenuOption TextOption menu-option"
+                role="button"
               >
-                Copy link
+                <div
+                  class="d-flex"
+                >
+                  <div
+                    class="menu-option__icon"
+                  >
+                    <i
+                      class="CompassIcon icon-link-variant LinkIcon"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="menu-option__content"
+                >
+                  <div
+                    class="menu-name"
+                  >
+                    Copy link
+                  </div>
+                </div>
+                <div
+                  class="noicon"
+                />
               </div>
-              <div
-                class="noicon"
-              />
             </div>
+            <div />
           </div>
           <div
             class="menu-spacer hideOnWidescreen"
@@ -833,12 +1152,20 @@ exports[`src/components/gallery/GalleryCard without block content should match s
               role="button"
             >
               <div
-                class="noicon"
-              />
-              <div
-                class="menu-name"
+                class="d-flex"
               >
-                Cancel
+                <div
+                  class="noicon"
+                />
+              </div>
+              <div
+                class="menu-option__content"
+              >
+                <div
+                  class="menu-name"
+                >
+                  Cancel
+                </div>
               </div>
               <div
                 class="noicon"
@@ -859,7 +1186,9 @@ exports[`src/components/gallery/GalleryCard without block content should match s
       >
         i
       </div>
-      <div>
+      <div
+        class="octo-titletext"
+      >
         title
       </div>
     </div>
@@ -871,7 +1200,7 @@ exports[`src/components/gallery/GalleryCard without block content should match s
         data-tooltip="testTemplateProperty"
       >
         <div
-          class="octo-propertyvalue"
+          class="octo-propertyvalue octo-propertyvalue--readonly"
         />
       </div>
     </div>

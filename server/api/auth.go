@@ -3,9 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
@@ -16,130 +14,20 @@ import (
 	"github.com/mattermost/focalboard/server/services/auth"
 	"github.com/mattermost/focalboard/server/utils"
 
-	"github.com/mattermost/mattermost-server/v6/shared/mlog"
+	"github.com/mattermost/mattermost/server/public/shared/mlog"
 )
 
-const (
-	MinimumPasswordLength = 8
-)
-
-type ParamError struct {
-	msg string
-}
-
-func (pe ParamError) Error() string {
-	return pe.msg
-}
-
-// LoginRequest is a login request
-// swagger:model
-type LoginRequest struct {
-	// Type of login, currently must be set to "normal"
-	// required: true
-	Type string `json:"type"`
-
-	// If specified, login using username
-	// required: false
-	Username string `json:"username"`
-
-	// If specified, login using email
-	// required: false
-	Email string `json:"email"`
-
-	// Password
-	// required: true
-	Password string `json:"password"`
-
-	// MFA token
-	// required: false
-	// swagger:ignore
-	MfaToken string `json:"mfa_token"`
-}
-
-// LoginResponse is a login response
-// swagger:model
-type LoginResponse struct {
-	// Session token
-	// required: true
-	Token string `json:"token"`
-}
-
-func LoginResponseFromJSON(data io.Reader) (*LoginResponse, error) {
-	var resp LoginResponse
-	if err := json.NewDecoder(data).Decode(&resp); err != nil {
-		return nil, err
-	}
-	return &resp, nil
-}
-
-// RegisterRequest is a user registration request
-// swagger:model
-type RegisterRequest struct {
-	// User name
-	// required: true
-	Username string `json:"username"`
-
-	// User's email
-	// required: true
-	Email string `json:"email"`
-
-	// Password
-	// required: true
-	Password string `json:"password"`
-
-	// Registration authorization token
-	// required: true
-	Token string `json:"token"`
-}
-
-func (rd *RegisterRequest) IsValid() error {
-	if strings.TrimSpace(rd.Username) == "" {
-		return ParamError{"username is required"}
-	}
-	if strings.TrimSpace(rd.Email) == "" {
-		return ParamError{"email is required"}
-	}
-	if !auth.IsEmailValid(rd.Email) {
-		return ParamError{"invalid email format"}
-	}
-	if rd.Password == "" {
-		return ParamError{"password is required"}
-	}
-	return isValidPassword(rd.Password)
-}
-
-// ChangePasswordRequest is a user password change request
-// swagger:model
-type ChangePasswordRequest struct {
-	// Old password
-	// required: true
-	OldPassword string `json:"oldPassword"`
-
-	// New password
-	// required: true
-	NewPassword string `json:"newPassword"`
-}
-
-// IsValid validates a password change request.
-func (rd *ChangePasswordRequest) IsValid() error {
-	if rd.OldPassword == "" {
-		return ParamError{"old password is required"}
-	}
-	if rd.NewPassword == "" {
-		return ParamError{"new password is required"}
-	}
-	return isValidPassword(rd.NewPassword)
-}
-
-func isValidPassword(password string) error {
-	if len(password) < MinimumPasswordLength {
-		return ParamError{fmt.Sprintf("password must be at least %d characters", MinimumPasswordLength)}
-	}
-	return nil
+func (a *API) registerAuthRoutes(r *mux.Router) {
+	// personal-server specific routes. These are not needed in plugin mode.
+	r.HandleFunc("/login", a.handleLogin).Methods("POST")
+	r.HandleFunc("/logout", a.sessionRequired(a.handleLogout)).Methods("POST")
+	r.HandleFunc("/register", a.handleRegister).Methods("POST")
+	r.HandleFunc("/teams/{teamID}/regenerate_signup_token", a.sessionRequired(a.handlePostTeamRegenerateSignupToken)).Methods("POST")
+	r.HandleFunc("/users/{userID}/changepassword", a.sessionRequired(a.handleChangePassword)).Methods("POST")
 }
 
 func (a *API) handleLogin(w http.ResponseWriter, r *http.Request) {
-	// swagger:operation POST /api/v1/login login
+	// swagger:operation POST /login login
 	//
 	// Login user
 	//
@@ -166,23 +54,27 @@ func (a *API) handleLogin(w http.ResponseWriter, r *http.Request) {
 	//     description: internal error
 	//     schema:
 	//       "$ref": "#/definitions/ErrorResponse"
+	if a.MattermostAuth {
+		a.errorResponse(w, r, model.NewErrNotImplemented("not permitted in plugin mode"))
+		return
+	}
 
 	if len(a.singleUserToken) > 0 {
 		// Not permitted in single-user mode
-		a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "not permitted in single-user mode", nil)
+		a.errorResponse(w, r, model.NewErrUnauthorized("not permitted in single-user mode"))
 		return
 	}
 
-	requestBody, err := ioutil.ReadAll(r.Body)
+	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err)
+		a.errorResponse(w, r, err)
 		return
 	}
 
-	var loginData LoginRequest
+	var loginData model.LoginRequest
 	err = json.Unmarshal(requestBody, &loginData)
 	if err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err)
+		a.errorResponse(w, r, err)
 		return
 	}
 
@@ -194,12 +86,12 @@ func (a *API) handleLogin(w http.ResponseWriter, r *http.Request) {
 	if loginData.Type == "normal" {
 		token, err := a.app.Login(loginData.Username, loginData.Email, loginData.Password, loginData.MfaToken)
 		if err != nil {
-			a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "incorrect login", err)
+			a.errorResponse(w, r, model.NewErrUnauthorized("incorrect login"))
 			return
 		}
-		json, err := json.Marshal(LoginResponse{Token: token})
+		json, err := json.Marshal(model.LoginResponse{Token: token})
 		if err != nil {
-			a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err)
+			a.errorResponse(w, r, err)
 			return
 		}
 
@@ -208,11 +100,11 @@ func (a *API) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.errorResponse(w, r.URL.Path, http.StatusBadRequest, "invalid login type", nil)
+	a.errorResponse(w, r, model.NewErrBadRequest("invalid login type"))
 }
 
 func (a *API) handleLogout(w http.ResponseWriter, r *http.Request) {
-	// swagger:operation POST /api/v1/logout logout
+	// swagger:operation POST /logout logout
 	//
 	// Logout user
 	//
@@ -228,10 +120,14 @@ func (a *API) handleLogout(w http.ResponseWriter, r *http.Request) {
 	//     description: internal error
 	//     schema:
 	//       "$ref": "#/definitions/ErrorResponse"
+	if a.MattermostAuth {
+		a.errorResponse(w, r, model.NewErrNotImplemented("not permitted in plugin mode"))
+		return
+	}
 
 	if len(a.singleUserToken) > 0 {
 		// Not permitted in single-user mode
-		a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "not permitted in single-user mode", nil)
+		a.errorResponse(w, r, model.NewErrUnauthorized("not permitted in single-user mode"))
 		return
 	}
 
@@ -244,7 +140,7 @@ func (a *API) handleLogout(w http.ResponseWriter, r *http.Request) {
 	auditRec.AddMeta("userID", session.UserID)
 
 	if err := a.app.Logout(session.ID); err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "incorrect login", err)
+		a.errorResponse(w, r, model.NewErrUnauthorized("incorrect logout"))
 		return
 	}
 
@@ -255,7 +151,7 @@ func (a *API) handleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
-	// swagger:operation POST /api/v1/register register
+	// swagger:operation POST /register register
 	//
 	// Register new user
 	//
@@ -278,23 +174,27 @@ func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
 	//     description: internal error
 	//     schema:
 	//       "$ref": "#/definitions/ErrorResponse"
+	if a.MattermostAuth {
+		a.errorResponse(w, r, model.NewErrNotImplemented("not permitted in plugin mode"))
+		return
+	}
 
 	if len(a.singleUserToken) > 0 {
 		// Not permitted in single-user mode
-		a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "not permitted in single-user mode", nil)
+		a.errorResponse(w, r, model.NewErrUnauthorized("not permitted in single-user mode"))
 		return
 	}
 
-	requestBody, err := ioutil.ReadAll(r.Body)
+	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err)
+		a.errorResponse(w, r, err)
 		return
 	}
 
-	var registerData RegisterRequest
+	var registerData model.RegisterRequest
 	err = json.Unmarshal(requestBody, &registerData)
 	if err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err)
+		a.errorResponse(w, r, err)
 		return
 	}
 	registerData.Email = strings.TrimSpace(registerData.Email)
@@ -302,31 +202,31 @@ func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	// Validate token
 	if len(registerData.Token) > 0 {
-		workspace, err2 := a.app.GetRootWorkspace()
+		team, err2 := a.app.GetRootTeam()
 		if err2 != nil {
-			a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err2)
+			a.errorResponse(w, r, err2)
 			return
 		}
 
-		if registerData.Token != workspace.SignupToken {
-			a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "invalid token", nil)
+		if registerData.Token != team.SignupToken {
+			a.errorResponse(w, r, model.NewErrUnauthorized("invalid token"))
 			return
 		}
 	} else {
 		// No signup token, check if no active users
 		userCount, err2 := a.app.GetRegisteredUserCount()
 		if err2 != nil {
-			a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err2)
+			a.errorResponse(w, r, err2)
 			return
 		}
 		if userCount > 0 {
-			a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "no sign-up token and user(s) already exist", nil)
+			a.errorResponse(w, r, model.NewErrUnauthorized("no sign-up token and user(s) already exist"))
 			return
 		}
 	}
 
 	if err = registerData.IsValid(); err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusBadRequest, err.Error(), err)
+		a.errorResponse(w, r, err)
 		return
 	}
 
@@ -336,7 +236,7 @@ func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	err = a.app.RegisterUser(registerData.Username, registerData.Email, registerData.Password)
 	if err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusBadRequest, err.Error(), err)
+		a.errorResponse(w, r, model.NewErrBadRequest(err.Error()))
 		return
 	}
 
@@ -345,7 +245,7 @@ func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) handleChangePassword(w http.ResponseWriter, r *http.Request) {
-	// swagger:operation POST /api/v1/users/{userID}/changepassword changePassword
+	// swagger:operation POST /users/{userID}/changepassword changePassword
 	//
 	// Change a user's password
 	//
@@ -377,30 +277,34 @@ func (a *API) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 	//     description: internal error
 	//     schema:
 	//       "$ref": "#/definitions/ErrorResponse"
+	if a.MattermostAuth {
+		a.errorResponse(w, r, model.NewErrNotImplemented("not permitted in plugin mode"))
+		return
+	}
 
 	if len(a.singleUserToken) > 0 {
 		// Not permitted in single-user mode
-		a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "not permitted in single-user mode", nil)
+		a.errorResponse(w, r, model.NewErrUnauthorized("not permitted in single-user mode"))
 		return
 	}
 
 	vars := mux.Vars(r)
 	userID := vars["userID"]
 
-	requestBody, err := ioutil.ReadAll(r.Body)
+	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err)
+		a.errorResponse(w, r, err)
 		return
 	}
 
-	var requestData ChangePasswordRequest
+	var requestData model.ChangePasswordRequest
 	if err = json.Unmarshal(requestBody, &requestData); err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusInternalServerError, "", err)
+		a.errorResponse(w, r, err)
 		return
 	}
 
 	if err = requestData.IsValid(); err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusBadRequest, err.Error(), err)
+		a.errorResponse(w, r, err)
 		return
 	}
 
@@ -408,7 +312,7 @@ func (a *API) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 	defer a.audit.LogRecord(audit.LevelAuth, auditRec)
 
 	if err = a.app.ChangePassword(userID, requestData.OldPassword, requestData.NewPassword); err != nil {
-		a.errorResponse(w, r.URL.Path, http.StatusBadRequest, err.Error(), err)
+		a.errorResponse(w, r, model.NewErrBadRequest(err.Error()))
 		return
 	}
 
@@ -427,15 +331,15 @@ func (a *API) attachSession(handler func(w http.ResponseWriter, r *http.Request)
 		a.logger.Debug(`attachSession`, mlog.Bool("single_user", len(a.singleUserToken) > 0))
 		if len(a.singleUserToken) > 0 {
 			if required && (token != a.singleUserToken) {
-				a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "invalid single user token", nil)
+				a.errorResponse(w, r, model.NewErrUnauthorized("invalid single user token"))
 				return
 			}
 
 			now := utils.GetMillis()
 			session := &model.Session{
-				ID:          SingleUser,
+				ID:          model.SingleUser,
 				Token:       token,
-				UserID:      SingleUser,
+				UserID:      model.SingleUser,
 				AuthService: a.authService,
 				Props:       map[string]interface{}{},
 				CreateAt:    now,
@@ -458,6 +362,7 @@ func (a *API) attachSession(handler func(w http.ResponseWriter, r *http.Request)
 				CreateAt:    now,
 				UpdateAt:    now,
 			}
+
 			ctx := context.WithValue(r.Context(), sessionContextKey, session)
 			handler(w, r.WithContext(ctx))
 			return
@@ -466,7 +371,7 @@ func (a *API) attachSession(handler func(w http.ResponseWriter, r *http.Request)
 		session, err := a.app.GetSession(token)
 		if err != nil {
 			if required {
-				a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "", err)
+				a.errorResponse(w, r, model.NewErrUnauthorized(err.Error()))
 				return
 			}
 
@@ -476,12 +381,13 @@ func (a *API) attachSession(handler func(w http.ResponseWriter, r *http.Request)
 
 		authService := session.AuthService
 		if authService != a.authService {
-			a.logger.Error(`Session authService mismatch`,
+			msg := `Session authService mismatch`
+			a.logger.Error(msg,
 				mlog.String("sessionID", session.ID),
 				mlog.String("want", a.authService),
 				mlog.String("got", authService),
 			)
-			a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "", err)
+			a.errorResponse(w, r, model.NewErrUnauthorized(msg))
 			return
 		}
 
@@ -495,7 +401,7 @@ func (a *API) adminRequired(handler func(w http.ResponseWriter, r *http.Request)
 		// Currently, admin APIs require local unix connections
 		conn := GetContextConn(r)
 		if _, isUnix := conn.(*net.UnixConn); !isUnix {
-			a.errorResponse(w, r.URL.Path, http.StatusUnauthorized, "not a local unix connection", nil)
+			a.errorResponse(w, r, model.NewErrUnauthorized("not a local unix connection"))
 			return
 		}
 

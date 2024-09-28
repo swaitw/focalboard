@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	MetricsNamespace           = "focalboard"
-	MetricsSubsystemBlocks     = "blocks"
-	MetricsSubsystemWorkspaces = "workspaces"
-	MetricsSubsystemSystem     = "system"
+	MetricsNamespace       = "focalboard"
+	MetricsSubsystemBlocks = "blocks"
+	MetricsSubsystemBoards = "boards"
+	MetricsSubsystemTeams  = "teams"
+	MetricsSubsystemSystem = "system"
 
 	MetricsCloudInstallationLabel = "installationId"
 )
@@ -38,8 +39,9 @@ type Metrics struct {
 	blocksPatchedCount  prometheus.Counter
 	blocksDeletedCount  prometheus.Counter
 
-	blockCount     *prometheus.GaugeVec
-	workspaceCount prometheus.Gauge
+	blockCount *prometheus.GaugeVec
+	boardCount prometheus.Gauge
+	teamCount  prometheus.Gauge
 
 	blockLastActivity prometheus.Gauge
 }
@@ -143,14 +145,23 @@ func NewMetrics(info InstanceInfo) *Metrics {
 	}, []string{"BlockType"})
 	m.registry.MustRegister(m.blockCount)
 
-	m.workspaceCount = prometheus.NewGauge(prometheus.GaugeOpts{
+	m.boardCount = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace:   MetricsNamespace,
-		Subsystem:   MetricsSubsystemWorkspaces,
-		Name:        "workspaces_total",
-		Help:        "Total number of workspaces.",
+		Subsystem:   MetricsSubsystemBoards,
+		Name:        "boards_total",
+		Help:        "Total number of boards.",
 		ConstLabels: additionalLabels,
 	})
-	m.registry.MustRegister(m.workspaceCount)
+	m.registry.MustRegister(m.boardCount)
+
+	m.teamCount = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace:   MetricsNamespace,
+		Subsystem:   MetricsSubsystemTeams,
+		Name:        "teams_total",
+		Help:        "Total number of teams.",
+		ConstLabels: additionalLabels,
+	})
+	m.registry.MustRegister(m.teamCount)
 
 	m.blockLastActivity = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace:   MetricsNamespace,
@@ -209,8 +220,14 @@ func (m *Metrics) ObserveBlockCount(blockType string, count int64) {
 	}
 }
 
-func (m *Metrics) ObserveWorkspaceCount(count int64) {
+func (m *Metrics) ObserveBoardCount(count int64) {
 	if m != nil {
-		m.workspaceCount.Set(float64(count))
+		m.boardCount.Set(float64(count))
+	}
+}
+
+func (m *Metrics) ObserveTeamCount(count int64) {
+	if m != nil {
+		m.teamCount.Set(float64(count))
 	}
 }

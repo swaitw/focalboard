@@ -1,11 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import React, {useState} from 'react'
+import React, {useState, Suspense} from 'react'
 
 import {Utils} from '../utils'
 import './markdownEditor.scss'
 
-import MarkdownEditorInput from './markdownEditorInput/markdownEditorInput'
+const MarkdownEditorInput = React.lazy(() => import('./markdownEditorInput/markdownEditorInput'))
 
 type Props = {
     id?: string
@@ -17,11 +17,15 @@ type Props = {
     onChange?: (text: string) => void
     onFocus?: () => void
     onBlur?: (text: string) => void
+    onKeyDown?: (e: React.KeyboardEvent) => void
+    onEditorCancel?: () => void
+    autofocus?: boolean
+    saveOnEnter?: boolean
 }
 
 const MarkdownEditor = (props: Props): JSX.Element => {
-    const {placeholderText, onFocus, onBlur, onChange, text, id} = props
-    const [isEditing, setIsEditing] = useState(false)
+    const {placeholderText, onFocus, onEditorCancel, onBlur, onChange, text, id, saveOnEnter} = props
+    const [isEditing, setIsEditing] = useState(Boolean(props.autofocus))
     const html: string = Utils.htmlFromMarkdown(text || placeholderText || '')
 
     const previewElement = (
@@ -50,20 +54,23 @@ const MarkdownEditor = (props: Props): JSX.Element => {
     }
 
     const editorElement = (
-        <MarkdownEditorInput
-            id={id}
-            onChange={onChange}
-            onFocus={onFocus}
-            onBlur={editorOnBlur}
-            initialText={text}
-            isEditing={isEditing}
-        />
+        <Suspense fallback={<></>}>
+            <MarkdownEditorInput
+                id={id}
+                onChange={onChange}
+                onFocus={onFocus}
+                onEditorCancel={onEditorCancel}
+                onBlur={editorOnBlur}
+                initialText={text}
+                isEditing={isEditing}
+                saveOnEnter={saveOnEnter}
+            />
+        </Suspense>
     )
 
     const element = (
         <div className={`MarkdownEditor octo-editor ${props.className || ''} ${isEditing ? 'active' : ''}`}>
-            {!isEditing && previewElement}
-            {editorElement}
+            {isEditing ? editorElement : previewElement}
         </div>
     )
 
